@@ -6,6 +6,8 @@ select
 c.NrZlec,
 knt.knt_Akronim as 'Knt_Akronim',  -- tabela kontrahenci akronim
 knt.Knt_Nazwa1 as 'Knt_Nazwa', -- tabela kontrahenci nazwa
+c.SZN_Rok, 
+c.SZN_Miesiac,
 c.Rodzaj,
 c.Typ,
 --c.Czynnosc,
@@ -51,8 +53,10 @@ from (
 
 
 		select
-	tog.NrZlec
-	,tog.Rodzaj
+	tog.NrZlec,
+	tog.SZN_Rok, 
+tog.SZN_Miesiac,
+	tog.Rodzaj
 	,tog.Typ
 	,tog.Czynnosc
 	,tog.Skladnik
@@ -81,6 +85,8 @@ select
 case 
 when nag.SZN_Miesiac<9 then CONCAT('ZSR-', nag.SZN_Numer, '/', RIGHT(nag.SZN_Rok, 2), '/', '0', nag.SZN_Miesiac, '/', nag.SZN_Seria)
 else CONCAT('ZSR-', nag.SZN_Numer, '/', RIGHT(nag.SZN_Rok, 2), '/', nag.SZN_Miesiac, '/', nag.SZN_Seria) end AS NrZlec,
+nag.SZN_Rok, 
+nag.SZN_Miesiac,
 'Sprzedaz' AS Rodzaj,
 'C' as Typ,
 czyn.SZC_TwrNazwa as Czynnosc,
@@ -112,6 +118,8 @@ union all
 case
 when nag.SZN_Miesiac<9 then CONCAT('ZSR-', nag.SZN_Numer, '/', RIGHT(nag.SZN_Rok, 2), '/', '0', nag.SZN_Miesiac, '/', nag.SZN_Seria)
 else CONCAT('ZSR-', nag.SZN_Numer, '/', RIGHT(nag.SZN_Rok, 2), '/', nag.SZN_Miesiac, '/', nag.SZN_Seria) end AS NrZlec,
+nag.SZN_Rok, 
+nag.SZN_Miesiac,
 'Koszt' AS Rodzaj,
 'C' as Typ,
 czyn.SZC_TwrNazwa as Czynnosc,
@@ -142,6 +150,8 @@ select
 case
 when nag.SZN_Miesiac<9 then CONCAT('ZSR-', nag.SZN_Numer, '/', RIGHT(nag.SZN_Rok, 2), '/', '0', nag.SZN_Miesiac, '/', nag.SZN_Seria)
 else CONCAT('ZSR-', nag.SZN_Numer, '/', RIGHT(nag.SZN_Rok, 2), '/', nag.SZN_Miesiac, '/', nag.SZN_Seria) end AS NrZlec,
+nag.SZN_Rok, 
+nag.SZN_Miesiac,
 'Koszt' AS Rodzaj,
 'K' as Typ,
 koszt.SZK_Kod as Nazwa,
@@ -172,6 +182,8 @@ select
 case
 when nag.SZN_Miesiac<9 then CONCAT('ZSR-', nag.SZN_Numer, '/', RIGHT(nag.SZN_Rok, 2), '/', '0', nag.SZN_Miesiac, '/', nag.SZN_Seria)
 else CONCAT('ZSR-', nag.SZN_Numer, '/', RIGHT(nag.SZN_Rok, 2), '/', nag.SZN_Miesiac, '/', nag.SZN_Seria) end AS NrZlec,
+nag.SZN_Rok, 
+nag.SZN_Miesiac,
 'Sprzedaz' AS Rodzaj,
 'S' as Typ,
 czyn.SZC_TwrNazwa as Czynnosc,
@@ -205,6 +217,8 @@ select
 case
 when nag.SZN_Miesiac<9 then CONCAT('ZSR-', nag.SZN_Numer, '/', RIGHT(nag.SZN_Rok, 2), '/', '0', nag.SZN_Miesiac, '/', nag.SZN_Seria)
 else CONCAT('ZSR-', nag.SZN_Numer, '/', RIGHT(nag.SZN_Rok, 2), '/', nag.SZN_Miesiac, '/', nag.SZN_Seria) end AS NrZlec,
+nag.SZN_Rok, 
+nag.SZN_Miesiac,
 'Koszt' AS Rodzaj,
 'S' as Typ,
 czyn.SZC_TwrNazwa as Czynnosc,
@@ -265,7 +279,10 @@ left join cdn.twrkarty with (nolock) on sklad.SZS_TwrNumer=twr_gidnumer
 case
 when nag.SZN_Miesiac<9 then CONCAT('ZSR-', nag.SZN_Numer, '/', RIGHT(nag.SZN_Rok, 2), '/', '0', nag.SZN_Miesiac, '/', nag.SZN_Seria)
 else CONCAT('ZSR-', nag.SZN_Numer, '/', RIGHT(nag.SZN_Rok, 2), '/', nag.SZN_Miesiac, '/', nag.SZN_Seria) end AS NrZlec,
+nag.SZN_Rok, 
+nag.SZN_Miesiac,
 	'<nieznany>' as Rodzaj,
+	
 	null as Typ,
 	null as Czynnosc,
 	null as Skladnik,
@@ -302,11 +319,12 @@ else CONCAT('ZSR-', nag.SZN_Numer, '/', RIGHT(nag.SZN_Rok, 2), '/', nag.SZN_Mies
 					 where SUP_SUDId = 5
 					 GROUP BY SZU_SZNId) urz ON nagl.SZN_Id=urz.SZU_SZNId
  where --NrZlec='ZSR-119/24/02/S' and 
-	  SZN_Rok=2024
+	  c.SZN_Rok=2024
 	  and c.Rodzaj <> '<nieznany>'
 		group by c.Typ, c.SZN_Id, 
 
-		c.NrZlec, c.Rodzaj, c.Czynnosc,
+		c.NrZlec, 	c.SZN_Rok, 
+c.SZN_Miesiac,c.Rodzaj, c.Czynnosc,
 		c.Skladnik,c.skladnikkod,c.Urzadzenie,nagl.SZN_DataRozpoczecia,trn.trn_Zannumer--trn.trn_Gidnumer
 		,nagl.SZN_DataWystawienia,nagl.SZN_Stan,knt.Knt_Akronim,knt.Knt_Nazwa1,c.CzasWykonania,c.CzasRealizacji,KNT.Knt_Wojewodztwo,op.Ope_Ident,c.StatusCzynnosc,
 		KNT.Knt_Powiat,KNT.Knt_Gmina,KNT.Knt_Miasto,Trn_GidTyp, Trn_SpiTyp, Trn_TrnTyp, Trn_TrnNumer, Trn_TrnRok, Trn_TrnSeria, Trn_TrnMiesiac, Trn_TrnLp, nagl.szn_id,sl.SLW_WartoscS,
@@ -326,10 +344,13 @@ knt.knt_Akronim,
 knt.Knt_Nazwa1
 )
 
-SELECT sum(IloscCzynnosci) AS Roboczogodziny, Operator, Skladnik
+SELECT sum(IloscCzynnosci) AS Roboczogodziny, Operator, Skladnik, NrZlec,
+	SZN_Rok, 
+SZN_Miesiac
 FROM qwerty
 WHERE Skladnik = 'roboczogodzina;'
-GROUP BY Operator, Skladnik
+GROUP BY Operator, Skladnik, NrZlec, SZN_Rok, 
+SZN_Miesiac
 
 	
 
